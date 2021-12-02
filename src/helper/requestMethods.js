@@ -1,5 +1,5 @@
 import axios from "axios";
-import { deleteProductFailure, deleteProductStart, deleteProductSuccess, getProductFailure, getProductStart, getProductSuccess } from "../redux/productRedux";
+import { deleteProductSuccess, getFailure, getStart, getProductSuccess, createProductSuccess,updateProductSuccess } from "../redux/productRedux";
 import { loginFailure, loginStart, loginSuccess } from "../redux/userRedux";
 
 const BASE_URL = "http://localhost:5001/api/";
@@ -27,25 +27,44 @@ export const login = async (dispatch, user) => {
 };
 
 export const getProducts = async(dispatch) =>{
-dispatch(getProductStart())
+dispatch(getStart())
 try {
   const res = await publicRequest.get("/products")
   console.log(res)
   dispatch(getProductSuccess(res?.data))
 
 } catch (error) {
-  dispatch(getProductFailure())
+  dispatch(getFailure())
 }
 }
 
 export const deleteProduct = async(id, dispatch) =>{
-  dispatch(deleteProductStart())
+  dispatch(getStart())
   try {
     // const res = await userRequest.delete(`/products/${id}`)
     // console.log("🚀 ~ file: requestMethods.js ~ line 45 ~ deleteProduct ~ res", res)
     dispatch(deleteProductSuccess(id))
   } catch (error) {
-    dispatch(deleteProductFailure())
+    dispatch(getFailure())
+  }
+}
+
+export const updateProduct = async(id, product, dispatch)=>{
+  dispatch(getStart())
+  try {
+    const res = await userRequest.put(`/products/${id}`)
+    dispatch(updateProductSuccess({id, product}))
+  } catch (error) {
+    dispatch(getFailure())
+  }
+}
+export const createProduct = async(product, dispatch)=>{
+  dispatch(getStart())
+  try {
+    const res = await userRequest.post('/products', product)
+    dispatch(createProductSuccess(res?.data))
+  } catch (error) {
+    dispatch(getFailure())
   }
 }
 
