@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getProductFailure, getProductStart, getProductSuccess } from "../redux/productRedux";
+import { deleteProductFailure, deleteProductStart, deleteProductSuccess, getProductFailure, getProductStart, getProductSuccess } from "../redux/productRedux";
 import { loginFailure, loginStart, loginSuccess } from "../redux/userRedux";
 
 const BASE_URL = "http://localhost:5001/api/";
@@ -36,6 +36,17 @@ try {
 } catch (error) {
   dispatch(getProductFailure())
 }
+}
+
+export const deleteProduct = async(id, dispatch) =>{
+  dispatch(deleteProductStart())
+  try {
+    // const res = await userRequest.delete(`/products/${id}`)
+    // console.log("🚀 ~ file: requestMethods.js ~ line 45 ~ deleteProduct ~ res", res)
+    dispatch(deleteProductSuccess(id))
+  } catch (error) {
+    dispatch(deleteProductFailure())
+  }
 }
 
 

@@ -1,20 +1,20 @@
 import "./productList.css";
 import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
-import { productRows } from "../../dummyData";
+
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux"
-import { getProducts } from "../../helper/requestMethods";
+import { deleteProduct, getProducts } from "../../helper/requestMethods";
 
 export default function ProductList() {
-  const [data, setData] = useState(productRows);
+ 
   const dispatch = useDispatch()
   const products = useSelector(state => state.product.products)
   console.log("🚀 ~ file: ProductList.jsx ~ line 14 ~ ProductList ~ products", products)
 
   const handleDelete = (id) => {
-    setData(data.filter((item) => item.id !== id));
+   deleteProduct(id,dispatch)
   };
 
   useEffect(()=>{
@@ -55,7 +55,7 @@ export default function ProductList() {
             </Link>
             <DeleteOutline
               className="productListDelete"
-              onClick={() => handleDelete(params.row.id)}
+              onClick={() => handleDelete(params.row._id)}
             />
           </>
         );
