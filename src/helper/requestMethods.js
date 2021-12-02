@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getProductFailure, getProductStart, getProductSuccess } from "../redux/productRedux";
 import { loginFailure, loginStart, loginSuccess } from "../redux/userRedux";
 
 const BASE_URL = "http://localhost:5001/api/";
@@ -19,9 +20,22 @@ export const login = async (dispatch, user) => {
   dispatch(loginStart());
   try {
     const res = await publicRequest.post("/auth/login", user);
-    console.log(res)
-    dispatch(loginSuccess(res.data));
+    dispatch(loginSuccess(res?.data));
   } catch (error) {
     dispatch(loginFailure());
   }
 };
+
+export const getProducts = async(dispatch) =>{
+dispatch(getProductStart())
+try {
+  const res = await publicRequest.get("/products")
+  console.log(res)
+  dispatch(getProductSuccess(res?.data))
+
+} catch (error) {
+  dispatch(getProductFailure())
+}
+}
+
+
