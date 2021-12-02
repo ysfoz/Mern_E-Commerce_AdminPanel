@@ -9,7 +9,6 @@ export default function WidgetSm() {
   const getUsers = async () => {
     try {
       const res = await userRequest.get("/users/?new=true");
-      console.log("users", res);
       setUser(res.data);
     } catch (error) {
       console.log(error);
@@ -26,7 +25,7 @@ export default function WidgetSm() {
       <ul className="widgetSmList">
 
         {user?.map((item)=>(
-        <li className="widgetSmListItem" key={user._id}>
+        <li className="widgetSmListItem" key={item._id}>
           <img
             src={
               user.img ||
