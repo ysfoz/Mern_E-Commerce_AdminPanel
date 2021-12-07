@@ -11,7 +11,7 @@ export default function ProductList() {
  
   const dispatch = useDispatch()
   const products = useSelector(state => state.product.products)
-  console.log("🚀 ~ file: ProductList.jsx ~ line 14 ~ ProductList ~ products", products)
+ 
 
   const handleDelete = (id) => {
    deleteProduct(id,dispatch)

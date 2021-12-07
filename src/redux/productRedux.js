@@ -29,15 +29,19 @@ const ProductSlice = createSlice({
       state.isFetching = false;
       state.products.splice(
         state.products.findIndex((item) => item._id === action.payload),
-        1
-      );
+        1, 
+        );
+     
+        
     },
     // UPDATE
+    // this is not working ????
     updateProductSuccess: (state, action) => {
       state.isFetching = false;
       state.products[
-          state.findIndex((item) => item._id === action.payload.id)
+          state.products.findIndex((item) => item._id === action.payload.id)
       ] = action.payload.product
+    
     },
     // CREATE
     createProductSuccess: (state, action) => {

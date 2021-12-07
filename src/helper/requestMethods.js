@@ -2,9 +2,13 @@ import axios from "axios";
 import { deleteProductSuccess, getFailure, getStart, getProductSuccess, createProductSuccess,updateProductSuccess } from "../redux/productRedux";
 import { loginFailure, loginStart, loginSuccess } from "../redux/userRedux";
 
-const BASE_URL = "http://localhost:5001/api/";
-const TOKEN = JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user).currentUser.jwtToken
+const BASE_URL = "https://mern-e-commerce-api.herokuapp.com/api/";
 
+let TOKEN = {}
+
+if (localStorage.getItem("persist:root")){
+TOKEN = JSON.parse(JSON.parse(localStorage.getItem("persist:root"))?.user)?.currentUser?.jwtToken
+}
 
 
 export const publicRequest = axios.create({
@@ -50,11 +54,14 @@ export const deleteProduct = async(id, dispatch) =>{
 }
 
 export const updateProduct = async(id, product, dispatch)=>{
+console.log("🚀 ~ file: requestMethods.js ~ line 57 ~ updateProduct ~ product", product)
+console.log("🚀 ~ file: requestMethods.js ~ line 57 ~ updateProduct ~ id", id)
   dispatch(getStart())
   try {
     const res = await userRequest.put(`/products/${id}`)
-    dispatch(updateProductSuccess({id, product}))
+    dispatch(updateProductSuccess(id, product))
   } catch (error) {
+    console.log(error)
     dispatch(getFailure())
   }
 }
