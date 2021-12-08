@@ -9,24 +9,28 @@ import {
   getProducts,
 } from "../../helper/requestMethods";
 import { useEffect, useMemo, useState } from "react";
-import { useSelector  } from "react-redux";
+import { useSelector } from "react-redux";
 import axios from "axios";
-import { getStorage, ref,deleteObject, uploadBytesResumable, getDownloadURL} from "firebase/storage"
+import {
+  getStorage,
+  ref,
+  deleteObject,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 import app from "../../helper/firebase";
 
 export default function Product() {
   const location = useLocation().pathname;
   const productId = location?.split("/")[2];
-  const product = useSelector((state) =>state?.product?.products?.find((product) => product?._id === productId));
+  const product = useSelector((state) =>
+    state?.product?.products?.find((product) => product?._id === productId)
+  );
   const [pStats, setPStats] = useState([]);
   const [productItem, setProductItem] = useState({});
-  const [imgFile, setImgFile] = useState(null)
+  const [imgFile, setImgFile] = useState(null);
 
-
-
- const TOKEN = JSON.parse(JSON.parse(localStorage.getItem("persist:root"))?.user)?.currentUser?.jwtToken
-
-  
+  const TOKEN = useSelector(state=> state?.user?.currentUser?.jwtToken)
 
   const MONTHS = useMemo(
     () => [
@@ -82,87 +86,85 @@ export default function Product() {
         `https://mern-e-commerce-api.herokuapp.com/api/products/${productId}`,
         product,
         { headers: { token: `Bearer ${TOKEN}` || "Bearer 123" } }
-      
-        );
-        console.log("axios",res?.data)
+      );
+      console.log("axios", res?.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
-const deleteImg=() => {
-  const storage = getStorage(app);
+  const deleteImg = () => {
+    const storage = getStorage(app);
 
-  // Create a reference to the file to delete
-  const desertRef = ref(storage, product?.img);
-  
-  // Delete the file
-  deleteObject(desertRef).then(() => {
-    // File deleted successfully
-  }).catch((error) => {
-    // Uh-oh, an error occurred!
-  });
+    // Create a reference to the file to delete
+    const desertRef = ref(storage, product?.img);
 
-}
+    // Delete the file
+    deleteObject(desertRef)
+      .then(() => {
+        // File deleted successfully
+      })
+      .catch((error) => {
+        // Uh-oh, an error occurred!
+      });
+  };
 
-const handleClick = (e)=> {
-  if(imgFile){
-  deleteImg()
-  e.preventDefault()
-  const fileName= new Date().getTime() + imgFile.name
-  const storage = getStorage(app)
-  const storageRef = ref(storage,fileName)
-  const uploadTask = uploadBytesResumable(storageRef, fileName);
+  const handleClick = (e) => {
+    if (imgFile) {
+      deleteImg();
+      e.preventDefault();
+      const fileName = new Date().getTime() + imgFile.name;
+      const storage = getStorage(app);
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, fileName);
 
-// Listen for state changes, errors, and completion of the upload.
-uploadTask.on('state_changed',
-  (snapshot) => {
-    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    console.log('Upload is ' + progress + '% done');
-    switch (snapshot.state) {
-      case 'paused':
-        console.log('Upload is paused');
-        break;
-      case 'running':
-        console.log('Upload is running');
-        break;
-        
+      // Listen for state changes, errors, and completion of the upload.
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          switch (error.code) {
+            case "storage/unauthorized":
+              // User doesn't have permission to access the object
+              break;
+            case "storage/canceled":
+              // User canceled the upload
+              break;
+
+            // ...
+
+            case "storage/unknown":
+              // Unknown error occurred, inspect error.serverResponse
+              break;
+          }
+        },
+        () => {
+          // Upload completed successfully, now we can get the download URL
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            const product = { ...productItem, img: downloadURL };
+            updateProduct(product);
+          });
+        }
+      );
+    } else {
+      updateProduct(productItem);
     }
-  }, 
-  (error) => {
-    // A full list of error codes is available at
-    // https://firebase.google.com/docs/storage/web/handle-errors
-    switch (error.code) {
-      case 'storage/unauthorized':
-        // User doesn't have permission to access the object
-        break;
-      case 'storage/canceled':
-        // User canceled the upload
-        break;
-
-      // ...
-
-      case 'storage/unknown':
-        // Unknown error occurred, inspect error.serverResponse
-        break;
-    }
-  }, 
-  () => {
-    // Upload completed successfully, now we can get the download URL
-    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-      const product = {...productItem, img:downloadURL};
-      updateProduct(product)
-    });
-  }
-);
- 
-  
-} else {
-  updateProduct(productItem)
-}
-}
-
+  };
 
   return (
     <div className="product">
@@ -236,14 +238,18 @@ uploadTask.on('state_changed',
               <label htmlFor="file">
                 <Publish />
               </label>
-              <input type="file" id="file" style={{ display: "none" }} onChange = {(e)=> setImgFile(e.target.files[0])}/>
+              <input
+                type="file"
+                id="file"
+                style={{ display: "none" }}
+                onChange={(e) => setImgFile(e.target.files[0])}
+              />
             </div>
           </div>
         </form>
         <button onClick={handleClick} className="productButton">
           Update
         </button>
-        
       </div>
     </div>
   );

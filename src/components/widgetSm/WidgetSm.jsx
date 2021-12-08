@@ -1,22 +1,19 @@
+
 import "./widgetSm.css";
 import { Visibility } from "@material-ui/icons";
 import { useState, useEffect } from "react";
-import { userRequest } from "../../helper/requestMethods";
+import { userRequest, getAllUsers } from "../../helper/requestMethods";
+import { useDispatch , useSelector} from "react-redux"
 
 export default function WidgetSm() {
-  const [user, setUser] = useState([]);
+  const dispatch = useDispatch()
+  const users = useSelector(state=> state?.user?.users)
+  
 
-  const getUsers = async () => {
-    try {
-      const res = await userRequest.get("/users/?new=true");
-      setUser(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
 
   useEffect(() => {
-    getUsers();
+    getAllUsers(dispatch,"?new=true");
   }, []);
 
   return (
@@ -24,11 +21,11 @@ export default function WidgetSm() {
       <span className="widgetSmTitle">New Join Members</span>
       <ul className="widgetSmList">
 
-        {user?.map((item)=>(
+        {users?.map((item)=>(
         <li className="widgetSmListItem" key={item._id}>
           <img
             src={
-              user.img ||
+              item.img ||
               "https://crowd-literature.eu/wp-content/uploads/2015/01/no-avatar.gif"
             }
             alt=""

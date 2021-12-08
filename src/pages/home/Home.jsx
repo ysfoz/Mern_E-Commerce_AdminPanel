@@ -39,7 +39,7 @@ const getStats = async()=>{
     console.log(error)
   }
 }
-console.log(userStats)
+
 
 useEffect(()=>{
   getStats()

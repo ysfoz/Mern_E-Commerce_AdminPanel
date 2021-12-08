@@ -1,6 +1,6 @@
 import axios from "axios";
 import { deleteProductSuccess, getFailure, getStart, getProductSuccess, createProductSuccess,updateProductSuccess } from "../redux/productRedux";
-import { loginFailure, loginStart, loginSuccess } from "../redux/userRedux";
+import { getUserFailure, getUserStart, loginSuccess, getAllUsersSuccess } from "../redux/userRedux";
 
 const BASE_URL = "https://mern-e-commerce-api.herokuapp.com/api/";
 
@@ -19,22 +19,57 @@ export const userRequest = axios.create({
   baseURL: BASE_URL,
   headers: { token: `Bearer ${TOKEN}` },
 });
+ // USER
 
+ //Login
 export const login = async (dispatch, user) => {
-  dispatch(loginStart());
+  dispatch(getUserStart());
   try {
     const res = await publicRequest.post("/auth/login", user);
     dispatch(loginSuccess(res?.data));
   } catch (error) {
-    dispatch(loginFailure());
+    dispatch(getUserFailure());
   }
 };
+
+// Get All Users
+
+export const getAllUsers = async(dispatch,query) => {
+    dispatch(getUserStart)
+    try {
+      const res = await userRequest.get(`/users/${query}`)
+      
+      dispatch(getAllUsersSuccess(res?.data))
+    } catch (error) {
+      dispatch(getUserFailure)
+    }
+}
+
+//Create
+ export const createUser = async() =>{
+
+ }
+
+
+//update
+export const updateUser = async() => {
+
+}
+
+
+//delete
+
+const deleteUser = async()=>{
+
+}
+
+
+// PRODUCTS
 
 export const getProducts = async(dispatch) =>{
 dispatch(getStart())
 try {
   const res = await publicRequest.get("/products")
-  console.log(res)
   dispatch(getProductSuccess(res?.data))
 
 } catch (error) {
@@ -54,8 +89,6 @@ export const deleteProduct = async(id, dispatch) =>{
 }
 
 export const updateProduct = async(id, product, dispatch)=>{
-console.log("🚀 ~ file: requestMethods.js ~ line 57 ~ updateProduct ~ product", product)
-console.log("🚀 ~ file: requestMethods.js ~ line 57 ~ updateProduct ~ id", id)
   dispatch(getStart())
   try {
     const res = await userRequest.put(`/products/${id}`)

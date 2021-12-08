@@ -6,10 +6,7 @@ import { useState, useEffect } from "react";
 export default function FeaturedInfo() {
   const [income, setIncome] = useState([]);
   const [percentage, setPercentage] = useState(0);
-  console.log(
-    "🚀 ~ file: FeaturedInfo.jsx ~ line 8 ~ FeaturedInfo ~ income",
-    income
-  );
+  
 
   //! i must  control here after i finished all
   const getIncome = async () => {
