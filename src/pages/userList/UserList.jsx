@@ -2,8 +2,9 @@ import "./userList.css";
 import { useEffect, useState } from "react";
 import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
+import { userRows } from "../../dummyData";
 import { Link } from "react-router-dom";
-import { getAllUsers } from "../../helper/requestMethods";
+import { getAllUsers, deleteUser } from "../../helper/requestMethods";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
@@ -14,6 +15,10 @@ export default function UserList() {
   const dispatch = useDispatch();
   const users = useSelector((state) => state?.user?.users);
   const TOKEN = useSelector((state) => state?.user?.currentUser?.jwtToken);
+
+  const handleDelete = (id) => {
+   deleteUser(id, dispatch)
+  };
 
   const getOrders = async () => {
     try {
@@ -85,8 +90,8 @@ export default function UserList() {
       renderCell: (params) => {
         return (
           <div className="userListUser">
-            <img className="userListImg" src={params.row.avatar} alt="" />
-            {params.row.username}
+            <img className="userListImg" src={params?.row?.avatar} alt="" />
+            {params?.row?.username}
           </div>
         );
       },
@@ -109,12 +114,12 @@ export default function UserList() {
       renderCell: (params) => {
         return (
           <>
-            <Link to={"/user/" + params.row.id}>
+            <Link to={"/user/" + params?.row?.id}>
               <button className="userListEdit">Edit</button>
             </Link>
             <DeleteOutline
               className="userListDelete"
-              onClick={() => handleDelete(params.row.id)}
+              onClick={() => handleDelete(params?.row?.id)}
             />
           </>
         );
