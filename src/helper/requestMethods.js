@@ -14,6 +14,7 @@ import {
   getAllUsersSuccess,
   getUserDeleteSuccess,
   logoutSuccess,
+  registerSuccess,
 } from "../redux/userRedux";
 
 const BASE_URL = "https://mern-e-commerce-api.herokuapp.com/api/";
@@ -70,8 +71,18 @@ export const getAllUsers = async (dispatch, query) => {
   }
 };
 
-//Create
-export const createUser = async () => {};
+//Create / Register
+export const createUser = async (dispatch,newuser) => {
+console.log("🚀 ~ file: requestMethods.js ~ line 76 ~ createUser ~ newuser", newuser)
+  dispatch(getUserStart)
+  try {
+    const res = userRequest.post('/auth/adminregister', newuser)
+    console.log("🚀 ~ file: requestMethods.js ~ line 79 ~ createUser ~ res", res?.data)
+    dispatch(registerSuccess(res?.data))
+  } catch (error) {
+    dispatch(getUserFailure)
+  }
+};
 
 //update
 export const updateUser = async () => {};
