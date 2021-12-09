@@ -8,8 +8,140 @@ import {
 } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import "./user.css";
+import { useLocation } from "react-router-dom"
+import {useSelector} from "react-redux"
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import app from "../../helper/firebase";
+import { updateUser } from '../../helper/requestMethods'
+import { useDispatch } from "react-redux";
+import { useState } from "react";
 
 export default function User() {
+  const location = useLocation()
+  const userId = location?.pathname.split('/')[2]
+  const user = useSelector(state => state?.user?.users?.find((item)=> item._id === userId) )
+  const [imgFile, setImgFile] = useState(null);
+  const dispatch = useDispatch()
+
+
+  const formik = useFormik({
+    initialValues: {
+      username: user?.username,
+      email: user?.email,
+      password: "",
+      isAdmin: user?.isAdmin,
+      img: user?.img,
+    },
+    validationSchema: Yup.object({
+      username: Yup.string()
+        .required("username is required")
+        .min(3, "Username is too short - should be 3 chars minimum."),
+      email: Yup.string()
+        .email("Invalid Email")
+        .required("Email is required!!"),
+      password: Yup.string()
+        .required("No password provided.")
+        .min(6, "Password is too short - should be 6 chars minimum."),
+      isAdmin: Yup.boolean().default(false),
+      img: Yup.string()
+    }),
+    onSubmit: (values) => {
+    console.log("🚀 ~ file: NewUser.jsx ~ line 45 ~ NewUser ~ values", values)
+    handleClick(values)
+    
+  
+    },
+  });
+  console.log(formik.initialValues)
+
+  const deleteImg = () => {
+    const storage = getStorage(app);
+
+    // Create a reference to the file to delete
+    const desertRef = ref(storage, user?.img);
+
+    // Delete the file
+    deleteObject(desertRef)
+      .then(() => {
+        // File deleted successfully
+      })
+      .catch((error) => {
+        // Uh-oh, an error occurred!
+      });
+  };
+
+
+  const handleClick = (values)=> {
+    if (imgFile) {
+      deleteImg()
+    const fileName= new Date().getTime() + imgFile?.name
+    const storage = getStorage(app)
+    const storageRef = ref(storage,fileName)
+    const uploadTask = uploadBytesResumable(storageRef, fileName);
+  
+  // Listen for state changes, errors, and completion of the upload.
+  uploadTask.on('state_changed',
+    (snapshot) => {
+      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Upload is ' + progress + '% done');
+      switch (snapshot.state) {
+        case 'paused':
+          console.log('Upload is paused');
+          break;
+        case 'running':
+          console.log('Upload is running');
+          break;
+          
+      }
+    }, 
+    (error) => {
+      // A full list of error codes is available at
+      // https://firebase.google.com/docs/storage/web/handle-errors
+      switch (error.code) {
+        case 'storage/unauthorized':
+          // User doesn't have permission to access the object
+          break;
+        case 'storage/canceled':
+          // User canceled the upload
+          break;
+  
+        // ...
+  
+        case 'storage/unknown':
+          // Unknown error occurred, inspect error.serverResponse
+          break;
+      }
+    }, 
+    () => {
+      // Upload completed successfully, now we can get the download URL
+      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+        
+        updateUser(dispatch, userId,values)
+        console.log("🚀 ~ file: User.jsx ~ line 129 ~ getDownloadURL ~ values", values)
+        
+        
+      });
+    }
+    );
+  }else {
+    updateUser(dispatch,userId,values);
+    console.log("🚀 ~ file: User.jsx ~ line 137 ~ handleClick ~ values", values)
+  }
+    
+  }
+  
+
+
+ 
   return (
     <div className="user">
       <div className="userTitleContainer">
@@ -22,12 +154,12 @@ export default function User() {
         <div className="userShow">
           <div className="userShowTop">
             <img
-              src="https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
+              src={user?.img || "https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"}
               alt=""
               className="userShowImg"
             />
             <div className="userShowTopTitle">
-              <span className="userShowUsername">Anna Becker</span>
+              <span className="userShowUsername">{user?.username}</span>
               <span className="userShowUserTitle">Software Engineer</span>
             </div>
           </div>
@@ -48,7 +180,7 @@ export default function User() {
             </div>
             <div className="userShowInfo">
               <MailOutline className="userShowIcon" />
-              <span className="userShowInfoTitle">annabeck99@gmail.com</span>
+              <span className="userShowInfoTitle">{user?.email}</span>
             </div>
             <div className="userShowInfo">
               <LocationSearching className="userShowIcon" />
@@ -58,62 +190,73 @@ export default function User() {
         </div>
         <div className="userUpdate">
           <span className="userUpdateTitle">Edit</span>
-          <form className="userUpdateForm">
+          <form className="userUpdateForm"  onSubmit={formik.handleSubmit}>
             <div className="userUpdateLeft">
               <div className="userUpdateItem">
-                <label>Username</label>
+                <label htmlFor="username">Username</label>
                 <input
+                id="username"
+                name="username"
                   type="text"
-                  placeholder="annabeck99"
+                  placeholder="username"
                   className="userUpdateInput"
+                  onChange={formik.handleChange}
+                 onBlur={formik.handleBlur}
+                  value={formik.values.username}
                 />
+                {formik.touched.username && formik.errors.username ? (
+            <div>{formik.errors.username}</div>
+          ) : null}
+              </div>
+            
+              <div className="userUpdateItem">
+                <label htmlFor="email">Email</label>
+                <input
+                id="email"
+                name="email"
+                  type="text"
+                  placeholder="email"
+                  className="userUpdateInput"
+                  onChange={formik.handleChange}
+                 onBlur={formik.handleBlur}
+                  value={formik.values.email}
+                />
+                {formik.touched.email && formik.errors.email ? (
+            <div>{formik.errors.email}</div>
+          ) : null}
               </div>
               <div className="userUpdateItem">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  placeholder="Anna Becker"
-                  className="userUpdateInput"
-                />
+              <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="password"
+            className="userUpdateInput"
+            name="password"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.password}
+          />
+          {formik.touched.password && formik.errors.password ? (
+            <div>{formik.errors.password}</div>
+          ) : null}
               </div>
-              <div className="userUpdateItem">
-                <label>Email</label>
-                <input
-                  type="text"
-                  placeholder="annabeck99@gmail.com"
-                  className="userUpdateInput"
-                />
-              </div>
-              <div className="userUpdateItem">
-                <label>Phone</label>
-                <input
-                  type="text"
-                  placeholder="+1 123 456 67"
-                  className="userUpdateInput"
-                />
-              </div>
-              <div className="userUpdateItem">
-                <label>Address</label>
-                <input
-                  type="text"
-                  placeholder="New York | USA"
-                  className="userUpdateInput"
-                />
-              </div>
+              
             </div>
             <div className="userUpdateRight">
               <div className="userUpdateUpload">
                 <img
                   className="userUpdateImg"
-                  src="https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
+                  src={user?.img}
                   alt=""
                 />
                 <label htmlFor="file">
                   <Publish className="userUpdateIcon" />
                 </label>
-                <input type="file" id="file" style={{ display: "none" }} />
+                <input type="file" id="img" name="img" style={{ display: "none" }}  onChange={(e) => setImgFile(e.target.files[0])}
+                />
               </div>
-              <button className="userUpdateButton">Update</button>
+              <button type="submit" className="userUpdateButton">Update</button>
             </div>
           </form>
         </div>

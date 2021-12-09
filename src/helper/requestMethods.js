@@ -15,7 +15,9 @@ import {
   getUserDeleteSuccess,
   logoutSuccess,
   registerSuccess,
+  getUserUpdate
 } from "../redux/userRedux";
+
 
 const BASE_URL = "https://mern-e-commerce-api.herokuapp.com/api/";
 
@@ -54,38 +56,50 @@ export const logout = async (dispatch) => {
   try {
     dispatch(logoutSuccess());
   } catch (error) {
-    dispatch(getFailure);
+    dispatch(getFailure());
   }
 };
 
 // Get All Users
 
 export const getAllUsers = async (dispatch, query) => {
-  dispatch(getUserStart);
+  dispatch(getUserStart());
   try {
     const res = await userRequest.get(`/users/${query}`);
 
     dispatch(getAllUsersSuccess(res?.data));
   } catch (error) {
-    dispatch(getUserFailure);
+    dispatch(getUserFailure());
   }
 };
 
 //Create / Register
 export const createUser = async (dispatch,newuser) => {
-console.log("🚀 ~ file: requestMethods.js ~ line 76 ~ createUser ~ newuser", newuser)
-  dispatch(getUserStart)
+
+  dispatch(getUserStart())
   try {
-    const res = userRequest.post('/auth/adminregister', newuser)
-    console.log("🚀 ~ file: requestMethods.js ~ line 79 ~ createUser ~ res", res?.data)
+    const res = await userRequest.post('/auth/adminregister', newuser);
     dispatch(registerSuccess(res?.data))
+  
   } catch (error) {
-    dispatch(getUserFailure)
+    dispatch(getUserFailure())
   }
 };
 
 //update
-export const updateUser = async () => {};
+export const updateUser = async (dispatch,id,user) => {
+console.log("🚀 ~ file: requestMethods.js ~ line 91 ~ updateUser ~ user", user)
+dispatch(getUserStart())
+try {
+  const res = await userRequest.put(`/users/adminupdate/${id}`,user)
+  console.log("🚀 ~ file: requestMethods.js ~ line 93 ~ updateUser ~ res", res.data)
+  // const user = res?.data
+  dispatch(getUserUpdate(id,user))
+  
+} catch (error) {
+  dispatch(getUserFailure())
+}
+};
 
 //delete
 
@@ -114,27 +128,29 @@ export const getProducts = async (dispatch) => {
   }
 };
 
+
+//Delete
 export const deleteProduct = async (id, dispatch) => {
   dispatch(getStart());
   try {
-    // const res = await userRequest.delete(`/products/${id}`)
-    // console.log("🚀 ~ file: requestMethods.js ~ line 45 ~ deleteProduct ~ res", res)
+    const res = await userRequest.delete(`/products/${id}`)
     dispatch(deleteProductSuccess(id));
   } catch (error) {
     dispatch(getFailure());
   }
 };
 
+//Update
 export const updateProduct = async (id, product, dispatch) => {
   dispatch(getStart());
   try {
-    const res = await userRequest.put(`/products/${id}`);
+    const res = await userRequest.put(`/products/${id}`,product);
     dispatch(updateProductSuccess(id, product));
   } catch (error) {
-    console.log(error);
     dispatch(getFailure());
   }
 };
+// Create
 export const createProduct = async (product, dispatch) => {
   dispatch(getStart());
   try {

@@ -4,9 +4,10 @@ import Chart from "../../components/chart/Chart";
 import { Publish } from "@material-ui/icons";
 import {
   userRequest,
+  updateProduct
 } from "../../helper/requestMethods";
 import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import axios from "axios";
 import {
   getStorage,
@@ -26,6 +27,7 @@ export default function Product() {
   const [pStats, setPStats] = useState([]);
   const [productItem, setProductItem] = useState({});
   const [imgFile, setImgFile] = useState(null);
+  const dispatch = useDispatch()
 
   const TOKEN = useSelector(state=> state?.user?.currentUser?.jwtToken)
 
@@ -74,18 +76,18 @@ export default function Product() {
   };
 
 
-  const updateProduct = async (product) => {
-    try {
-      const res = await axios.put(
-        `https://mern-e-commerce-api.herokuapp.com/api/products/${productId}`,
-        product,
-        { headers: { token: `Bearer ${TOKEN}` || "Bearer 123" } }
-      );
-      console.log("axios", res?.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const updateProduct = async (product) => {
+  //   try {
+  //     const res = await axios.put(
+  //       `https://mern-e-commerce-api.herokuapp.com/api/products/${productId}`,
+  //       product,
+  //       { headers: { token: `Bearer ${TOKEN}` || "Bearer 123" } }
+  //     );
+  //     console.log("axios", res?.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const deleteImg = () => {
     const storage = getStorage(app);
@@ -105,7 +107,7 @@ export default function Product() {
 
   const handleClick = (e) => {
     if (imgFile) {
-      deleteImg();
+      deleteImg()
       e.preventDefault();
       const fileName = new Date().getTime() + imgFile.name;
       const storage = getStorage(app);
@@ -151,12 +153,12 @@ export default function Product() {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             const product = { ...productItem, img: downloadURL };
-            updateProduct(product);
+            updateProduct(productId,product,dispatch);
           });
         }
       );
     } else {
-      updateProduct(productItem);
+      updateProduct(productId, productItem, dispatch);
     }
   };
 

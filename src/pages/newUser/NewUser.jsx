@@ -7,13 +7,13 @@ import * as Yup from "yup";
 import {
   getStorage,
   ref,
-  deleteObject,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
 import app from "../../helper/firebase";
 import { createUser } from '../../helper/requestMethods'
 import { useDispatch } from "react-redux";
+
 
 export default function NewUser() {
   const [imgFile, setImgFile] = useState(null);
@@ -26,7 +26,7 @@ export default function NewUser() {
       email: "",
       password: "",
       isAdmin: false,
-      // img: "",
+      img: "",
     },
     validationSchema: Yup.object({
       username: Yup.string()
@@ -39,11 +39,12 @@ export default function NewUser() {
         .required("No password provided.")
         .min(6, "Password is too short - should be 6 chars minimum."),
       isAdmin: Yup.boolean().default(false),
-      // img: Yup.string()
+      img: Yup.string()
     }),
     onSubmit: (values) => {
     console.log("🚀 ~ file: NewUser.jsx ~ line 45 ~ NewUser ~ values", values)
-    createUser(dispatch,values)
+    handleClick(values)
+    
   
     },
   });
@@ -93,13 +94,12 @@ export default function NewUser() {
     () => {
       // Upload completed successfully, now we can get the download URL
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-        setImgFile(downloadURL).then(()=>{
-        createUser(dispatch, values)
-        })
+        const newUser = {...values, img:downloadURL }
+        createUser(dispatch, newUser)
         
       });
     }
-  );
+    );
    
     
   }
@@ -173,7 +173,7 @@ export default function NewUser() {
             <option value="false">No</option>
           </select>
         </div>
-        {/* <div className="newUserItem">
+        <div className="newUserItem">
           <label>Upload a profile photo</label>
           <div className="userUpdateUpload">
             <img
@@ -184,11 +184,11 @@ export default function NewUser() {
             <label htmlFor="img">
               <Publish className="userUpdateIcon" />
             </label>
-            <input type="file" id="img" name="img" style={{ display: "none" }} onChange={formik.handleChange}
-            value={imgFile}/>
+            <input type="file" id="img" name="img" style={{ display: "none" }}  onChange={(e) => setImgFile(e.target.files[0])}
+            />
           </div>
-        </div> */}
-        <button className="newUserButton">Create</button>
+        </div>
+        <button type="submit" className="newUserButton">Create</button>
       </form>
     </div>
   );

@@ -2,7 +2,6 @@ import "./userList.css";
 import { useEffect, useState } from "react";
 import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
-import { userRows } from "../../dummyData";
 import { Link } from "react-router-dom";
 import { getAllUsers, deleteUser } from "../../helper/requestMethods";
 import { useDispatch, useSelector } from "react-redux";

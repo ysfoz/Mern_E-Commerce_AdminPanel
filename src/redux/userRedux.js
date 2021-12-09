@@ -26,6 +26,9 @@ const userSlice = createSlice({
       state.isFetching = false
       state.users.push(action.payload)
     },
+    logoutSuccess:(state)=>{
+      state.currentUser = null
+    },
     getAllUsersSuccess: (state, action) => {
       state.isFetching = false;
       state.users = action.payload;
@@ -37,9 +40,11 @@ const userSlice = createSlice({
         1
       );
     },
-    logoutSuccess:(state)=>{
-      state.currentUser = null
+    getUserUpdate:(state,action)=>{
+      state.isFetching =false
+      state.users[state.users.findIndex((item) => item._id === action.payload.id)] = action.payload.user
     }
+   
   },
 });
 
@@ -50,7 +55,8 @@ export const {
   getAllUsersSuccess,
   getUserDeleteSuccess,
   logoutSuccess,
-  registerSuccess
+  registerSuccess,
+  getUserUpdate
   
 } = userSlice.actions;
 export default userSlice.reducer;
