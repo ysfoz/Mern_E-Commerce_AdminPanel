@@ -9,19 +9,18 @@ import {
   ref,
   uploadBytesResumable,
   getDownloadURL,
-  uploadBytes
 } from "firebase/storage";
 import app from "../../helper/firebase";
 import { createUser } from '../../helper/requestMethods'
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
 
 export default function NewUser() {
   const [imgFile, setImgFile] = useState(null);
-  console.log("🚀 ~ file: NewUser.jsx ~ line 21 ~ NewUser ~ imgFile", imgFile)
   const dispatch = useDispatch()
   const history = useHistory()
+  
  
 
   const formik = useFormik({
@@ -46,7 +45,6 @@ export default function NewUser() {
       img: Yup.string()
     }),
     onSubmit: (values) => {
-    console.log("🚀 ~ file: NewUser.jsx ~ line 45 ~ NewUser ~ values", values)
     handleClick(values)
     history.push('/users')
     
@@ -56,10 +54,9 @@ export default function NewUser() {
 
 
   const handleClick = (values)=> {
-    // e.preventDefault()
-    const fileName= new Date().getTime() + imgFile[0]?.name
+    const fileName= "profilePhoto" + new Date().getTime() + imgFile[0]?.name
     const storage = getStorage(app)
-    const usersRef = ref(storage,"users")
+    const usersRef = ref(storage,`users/${values.username}/`)
     const storageRef = ref(usersRef,fileName)
     const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
 

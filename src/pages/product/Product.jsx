@@ -2,13 +2,9 @@ import { Link, useLocation } from "react-router-dom";
 import "./product.css";
 import Chart from "../../components/chart/Chart";
 import { Publish } from "@material-ui/icons";
-import {
-  userRequest,
-  updateProduct
-} from "../../helper/requestMethods";
+import { userRequest, updateProduct } from "../../helper/requestMethods";
 import { useEffect, useMemo, useState } from "react";
-import { useSelector,useDispatch } from "react-redux";
-import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
 import {
   getStorage,
   ref,
@@ -17,6 +13,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import app from "../../helper/firebase";
+import { useHistory } from "react-router";
 
 export default function Product() {
   const location = useLocation().pathname;
@@ -27,9 +24,8 @@ export default function Product() {
   const [pStats, setPStats] = useState([]);
   const [productItem, setProductItem] = useState({});
   const [imgFile, setImgFile] = useState(null);
-  const dispatch = useDispatch()
-
-  const TOKEN = useSelector(state=> state?.user?.currentUser?.jwtToken)
+  const dispatch = useDispatch();
+  const history = useHistory();
 
   const MONTHS = useMemo(
     () => [
@@ -75,20 +71,6 @@ export default function Product() {
     });
   };
 
-
-  // const updateProduct = async (product) => {
-  //   try {
-  //     const res = await axios.put(
-  //       `https://mern-e-commerce-api.herokuapp.com/api/products/${productId}`,
-  //       product,
-  //       { headers: { token: `Bearer ${TOKEN}` || "Bearer 123" } }
-  //     );
-  //     console.log("axios", res?.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
   const deleteImg = () => {
     const storage = getStorage(app);
 
@@ -107,12 +89,13 @@ export default function Product() {
 
   const handleClick = (e) => {
     if (imgFile) {
-      deleteImg()
+      deleteImg();
       e.preventDefault();
-      const fileName = new Date().getTime() + imgFile.name;
+      const fileName = "products" + new Date().getTime() + imgFile[0]?.name;
       const storage = getStorage(app);
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, fileName);
+      const productRef = ref(storage, `products/${productItem?.title}/`);
+      const storageRef = ref(productRef, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
 
       // Listen for state changes, errors, and completion of the upload.
       uploadTask.on(
@@ -153,12 +136,16 @@ export default function Product() {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             const product = { ...productItem, img: downloadURL };
-            updateProduct(productId,product,dispatch);
+            updateProduct(productId, product, dispatch).then(
+              history.push("/products")
+            );
           });
         }
       );
     } else {
-      updateProduct(productId, productItem, dispatch);
+      updateProduct(productId, productItem, dispatch).then(
+        history.push("/products")
+      );
     }
   };
 
@@ -238,7 +225,7 @@ export default function Product() {
                 type="file"
                 id="file"
                 style={{ display: "none" }}
-                onChange={(e) => setImgFile(e.target.files[0])}
+                onChange={(e) => setImgFile(e.target.files)}
               />
             </div>
           </div>
