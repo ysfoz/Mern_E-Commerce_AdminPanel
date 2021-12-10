@@ -23,6 +23,7 @@ import app from "../../helper/firebase";
 import { updateUser } from '../../helper/requestMethods'
 import { useDispatch } from "react-redux";
 import { useState } from "react";
+import { useHistory } from "react-router";
 
 export default function User() {
   const location = useLocation()
@@ -30,6 +31,7 @@ export default function User() {
   const user = useSelector(state => state?.user?.users?.find((item)=> item._id === userId) )
   const [imgFile, setImgFile] = useState(null);
   const dispatch = useDispatch()
+  const history = useHistory()
 
 
   const formik = useFormik({
@@ -54,10 +56,8 @@ export default function User() {
       img: Yup.string()
     }),
     onSubmit: (values) => {
-    console.log("🚀 ~ file: NewUser.jsx ~ line 45 ~ NewUser ~ values", values)
     handleClick(values)
-    
-  
+      
     },
   });
   console.log(formik.initialValues)
@@ -82,10 +82,11 @@ export default function User() {
   const handleClick = (values)=> {
     if (imgFile) {
       deleteImg()
-    const fileName= new Date().getTime() + imgFile?.name
+    const fileName= new Date().getTime() + imgFile[0]?.name
     const storage = getStorage(app)
-    const storageRef = ref(storage,fileName)
-    const uploadTask = uploadBytesResumable(storageRef, fileName);
+    const usersRef = ref(storage,"users")
+    const storageRef = ref(usersRef,fileName)
+    const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
   
   // Listen for state changes, errors, and completion of the upload.
   uploadTask.on('state_changed',
@@ -124,9 +125,9 @@ export default function User() {
     () => {
       // Upload completed successfully, now we can get the download URL
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-        
-        updateUser(dispatch, userId,values)
-        console.log("🚀 ~ file: User.jsx ~ line 129 ~ getDownloadURL ~ values", values)
+        const newUser = {...values, img:downloadURL }
+        updateUser(dispatch, userId,newUser).then(history.push('/users'))
+        console.log("🚀 ~ file: User.jsx ~ line 129 ~ getDownloadURL ~ values", newUser)
         
         
       });
@@ -154,7 +155,7 @@ export default function User() {
         <div className="userShow">
           <div className="userShowTop">
             <img
-              src={user?.img || "https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"}
+              src={user?.img ? user?.img : "https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"}
               alt=""
               className="userShowImg"
             />
@@ -250,10 +251,10 @@ export default function User() {
                   src={user?.img}
                   alt=""
                 />
-                <label htmlFor="file">
+                <label htmlFor="img">
                   <Publish className="userUpdateIcon" />
                 </label>
-                <input type="file" id="img" name="img" style={{ display: "none" }}  onChange={(e) => setImgFile(e.target.files[0])}
+                <input type="file" id="img" name="img" style={{ display: "none" }}  onChange={(e) => setImgFile(e.target.files)}
                 />
               </div>
               <button type="submit" className="userUpdateButton">Update</button>

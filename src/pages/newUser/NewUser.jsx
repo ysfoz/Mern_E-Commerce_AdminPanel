@@ -9,15 +9,19 @@ import {
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  uploadBytes
 } from "firebase/storage";
 import app from "../../helper/firebase";
 import { createUser } from '../../helper/requestMethods'
 import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
 
 
 export default function NewUser() {
   const [imgFile, setImgFile] = useState(null);
+  console.log("🚀 ~ file: NewUser.jsx ~ line 21 ~ NewUser ~ imgFile", imgFile)
   const dispatch = useDispatch()
+  const history = useHistory()
  
 
   const formik = useFormik({
@@ -44,6 +48,7 @@ export default function NewUser() {
     onSubmit: (values) => {
     console.log("🚀 ~ file: NewUser.jsx ~ line 45 ~ NewUser ~ values", values)
     handleClick(values)
+    history.push('/users')
     
   
     },
@@ -52,10 +57,13 @@ export default function NewUser() {
 
   const handleClick = (values)=> {
     // e.preventDefault()
-    const fileName= new Date().getTime() + imgFile?.name
+    const fileName= new Date().getTime() + imgFile[0]?.name
     const storage = getStorage(app)
-    const storageRef = ref(storage,fileName)
-    const uploadTask = uploadBytesResumable(storageRef, fileName);
+    const usersRef = ref(storage,"users")
+    const storageRef = ref(usersRef,fileName)
+    const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
+
+  
   
   // Listen for state changes, errors, and completion of the upload.
   uploadTask.on('state_changed',
@@ -184,7 +192,7 @@ export default function NewUser() {
             <label htmlFor="img">
               <Publish className="userUpdateIcon" />
             </label>
-            <input type="file" id="img" name="img" style={{ display: "none" }}  onChange={(e) => setImgFile(e.target.files[0])}
+            <input type="file" id="img" name="img" style={{ display: "none" }}  onChange={(e) => setImgFile(e.target.files)}
             />
           </div>
         </div>
