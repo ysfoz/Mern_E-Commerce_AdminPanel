@@ -6,18 +6,54 @@ import { Link } from "react-router-dom";
 import { getAllUsers, deleteUser } from "../../helper/requestMethods";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import {
+  getStorage,
+  ref,
+  deleteObject,
+} from "firebase/storage";
+import app from "../../helper/firebase";
 
 export default function UserList() {
   const [orders, setOrders] = useState([]);
   const [userInfo, setUserInfo] = useState([]);
 
+
   const dispatch = useDispatch();
-  const users = useSelector((state) => state?.user?.users);
+  const users = useSelector((state) => state.user.users);
   const TOKEN = useSelector((state) => state?.user?.currentUser?.jwtToken);
 
+  const confirmDelete = (id,img) =>{
+    var r = window.confirm("Are you sure to Delete!");
+    if (r == true) {
+      handleDelete(id)
+      deleteImg(img)
+    } 
+  
+  }
+
+// from Firebase
+  const deleteImg = (img) => {
+    const storage = getStorage(app);
+
+    // Create a reference to the file to delete
+    const desertRef = ref(storage, img);
+
+    // Delete the file
+    deleteObject(desertRef)
+      .then(() => {
+        // File deleted successfully
+      })
+      .catch((error) => {
+        // Uh-oh, an error occurred!
+      });
+  };
+
+  
+// from Redux
   const handleDelete = (id) => {
    deleteUser(id, dispatch)
   };
+
 
   const getOrders = async () => {
     try {
@@ -30,52 +66,63 @@ export default function UserList() {
       console.log(error);
     }
   };
+
+  // for create new object with transaction and status
   const createData = () => {
     let amount = 0;
+    let usersList=[]
+    console.log("🚀 ~ file: UserList.jsx ~ line 74 ~ createData ~ usersList", usersList)
 
     for (let i = 0; i < users?.length; i++) {
       for (let j = 0; j < orders?.length; j++) {
         if (users[i]?._id !== orders[j]?.userId) {
-          setUserInfo((prev) => [
-            ...prev,
+         usersList.push(
             {
               id: users[i]?._id,
               username: users[i]?.username,
               email: users[i]?.email,
-              avatar:
+              img:
                 users[i]?.img ||
                 "https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
               status: "Passive",
               transaction: 0,
             },
-          ]);
+         )
+         
         } else {
           amount += orders[j]?.amount;
-          setUserInfo((prev) => [
-            ...prev,
+          usersList.push(
             {
               id: users[i]?._id,
               username: users[i]?.username,
               email: users[i]?.email,
-              avatar:
+              img:
                 users[i]?.img ||
                 "https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
               status: "Active",
               transaction: amount,
-            },
-          ]);
+            }
+          )
         }
       }
     }
+    setUserInfo(usersList)
+    console.log("🚀 ~ file: UserList.jsx ~ line 110 ~ createData ~ usersList", usersList)
   };
 
+
+  // fetch all users
   useEffect(() => {
     getAllUsers(dispatch, "");
   }, []);
 
+
+  // fetch all orders
   useEffect(() => {
     getOrders();
   }, []);
+
+  // new object
   useEffect(() => {
     createData();
   }, [users, orders]);
@@ -89,8 +136,8 @@ export default function UserList() {
       renderCell: (params) => {
         return (
           <div className="userListUser">
-            <img className="userListImg" src={params?.row?.avatar} alt="" />
-            {params?.row?.username}
+            <img className="userListImg" src={params.row.img} alt="" />
+            {params.row.username}
           </div>
         );
       },
@@ -113,12 +160,12 @@ export default function UserList() {
       renderCell: (params) => {
         return (
           <>
-            <Link to={"/user/" + params?.row?.id}>
+            <Link to={"/user/" + params.row?.id}>
               <button className="userListEdit">Edit</button>
             </Link>
             <DeleteOutline
               className="userListDelete"
-              onClick={() => handleDelete(params?.row?.id)}
+              onClick={() => confirmDelete(params.row?.id,params.row?.img)}
             />
           </>
         );
@@ -132,8 +179,10 @@ export default function UserList() {
         rows={userInfo}
         disableSelectionOnClick
         columns={columns}
+        getRowId={(row)=>row.id }
         pageSize={8}
         checkboxSelection
+   
       />
     </div>
   );

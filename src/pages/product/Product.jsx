@@ -87,6 +87,10 @@ export default function Product() {
       });
   };
 
+  const historyPush = ()=>{
+    history.push("/products")
+  }
+
   const handleClick = (e) => {
     if (imgFile) {
       deleteImg();
@@ -136,16 +140,14 @@ export default function Product() {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             const product = { ...productItem, img: downloadURL };
-            updateProduct(productId, product, dispatch).then(
-              history.push("/products")
-            );
+            updateProduct(productId, product, dispatch,historyPush)
           });
         }
       );
     } else {
-      updateProduct(productId, productItem, dispatch).then(
-        history.push("/products")
-      );
+      updateProduct(productId, productItem, dispatch, historyPush)
+        
+      
     }
   };
 

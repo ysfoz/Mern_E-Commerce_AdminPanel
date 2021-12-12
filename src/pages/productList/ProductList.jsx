@@ -3,15 +3,29 @@ import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
 
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import { deleteProduct, getProducts } from "../../helper/requestMethods";
+import {
+  getStorage,
+  ref,
+  deleteObject,
+} from "firebase/storage";
+import app from "../../helper/firebase";
 
 export default function ProductList() {
  
   const dispatch = useDispatch()
   const products = useSelector(state => state.product.products)
  
+  const confirmDelete = (item,img) =>{
+    var r = window.confirm("Are you sure to Delete!");
+    if (r == true) {
+      handleDelete(item)
+      deleteImg(img)
+    } 
+  
+  }
 
   const handleDelete = (id) => {
    deleteProduct(id,dispatch)
@@ -20,9 +34,29 @@ export default function ProductList() {
   useEffect(()=>{
     getProducts(dispatch)
   },[dispatch])
+  
+
+
+  const deleteImg = (img) => {
+    const storage = getStorage(app);
+
+    // Create a reference to the file to delete
+    const desertRef = ref(storage,img);
+
+    // Delete the file
+    deleteObject(desertRef)
+      .then(() => {
+        // File deleted successfully
+      })
+      .catch((error) => {
+        // Uh-oh, an error occurred!
+      });
+  };
+
+
 
   const columns = [
-    { field: "_id", headerName: "ID", width: 220 },
+    { field: "id", headerName: "ID", width: 220 },
     {
       field: "product",
       headerName: "Product",
@@ -50,12 +84,12 @@ export default function ProductList() {
       renderCell: (params) => {
         return (
           <>
-            <Link to={"/product/" + params.row._id}>
+            <Link to={"/product/" + params.row?.id}>
               <button className="productListEdit">Edit</button>
             </Link>
             <DeleteOutline
               className="productListDelete"
-              onClick={() => handleDelete(params.row._id)}
+              onClick={() => confirmDelete(params.row?.id,params.row?.img)}
             />
           </>
         );
@@ -69,7 +103,7 @@ export default function ProductList() {
         rows={products}
         disableSelectionOnClick
         columns={columns}
-        getRowId={(row)=>row._id }
+        getRowId={(row)=>row.id }
         pageSize={8}
         checkboxSelection
       />

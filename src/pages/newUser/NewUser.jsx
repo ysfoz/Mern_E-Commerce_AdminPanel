@@ -12,7 +12,7 @@ import {
 } from "firebase/storage";
 import app from "../../helper/firebase";
 import { createUser } from '../../helper/requestMethods'
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 
 
@@ -54,7 +54,7 @@ export default function NewUser() {
 
 
   const handleClick = (values)=> {
-    const fileName= "profilePhoto" + new Date().getTime() + imgFile[0]?.name
+    const fileName= "AdminprofilePhoto" + new Date().getTime() + imgFile[0]?.name
     const storage = getStorage(app)
     const usersRef = ref(storage,`users/${values.username}/`)
     const storageRef = ref(usersRef,fileName)

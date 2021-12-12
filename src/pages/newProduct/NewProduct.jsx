@@ -27,6 +27,10 @@ export default function NewProduct() {
     setCat(e.target.value.split(","));
   };
 
+  const historyPush =() => {
+    history.push("/products");
+  }
+
   const handleClick = (e) => {
     e.preventDefault();
     const fileName = "products" + new Date().getTime() + imgFile[0]?.name;
@@ -73,8 +77,9 @@ export default function NewProduct() {
       () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          const product = { ...inputs, img: downloadURL, categories: cat };
-          createProduct(product, dispatch).then(history.push("/products"));
+          const product = { ...inputs, img: downloadURL, categories: cat }
+          createProduct(product, dispatch,historyPush)
+
         });
       }
     );
