@@ -71,7 +71,6 @@ export default function UserList() {
   const createData = () => {
     let amount = 0;
     let usersList=[]
-    console.log("🚀 ~ file: UserList.jsx ~ line 74 ~ createData ~ usersList", usersList)
 
     for (let i = 0; i < users?.length; i++) {
       for (let j = 0; j < orders?.length; j++) {
@@ -107,7 +106,6 @@ export default function UserList() {
       }
     }
     setUserInfo(usersList)
-    console.log("🚀 ~ file: UserList.jsx ~ line 110 ~ createData ~ usersList", usersList)
   };
 
 

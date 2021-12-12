@@ -1,28 +1,27 @@
 import "./widgetLg.css";
 import { useState, useEffect } from "react";
-import { userRequest } from "../../helper/requestMethods"
-import { format } from "timeago.js"
+import { userRequest } from "../../helper/requestMethods";
+import { format } from "timeago.js";
 
 export default function WidgetLg() {
   const Button = ({ type }) => {
     return <button className={"widgetLgButton " + type}>{type}</button>;
   };
 
- const [orders,setOrders] =useState([])
+  const [orders, setOrders] = useState([]);
 
- const getOrders = async() =>{
-   try {
-     const res = await userRequest.get("/orders")
-     setOrders(res?.data)
-     
-   } catch (error) {
-     console.log(error)
-   }
- }
+  const getOrders = async () => {
+    try {
+      const res = await userRequest.get("/orders");
+      setOrders(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
- useEffect(() => {
-   getOrders()
- },[])
+  useEffect(() => {
+    getOrders();
+  }, []);
 
   return (
     <div className="widgetLg">
@@ -34,24 +33,18 @@ export default function WidgetLg() {
           <th className="widgetLgTh">Amount</th>
           <th className="widgetLgTh">Status</th>
         </tr>
-        {orders?.map((item)=> (
-
-        <tr className="widgetLgTr" key={item._id}>
-          <td className="widgetLgUser">
-           
-            <span className="widgetLgName">{item?.userId}</span>
-          </td>
-          <td className="widgetLgDate">{format(item?.createdAt)}</td>
-          <td className="widgetLgAmount">{item?.amount}</td>
-          <td className="widgetLgStatus">
-            <Button type={item?.status} />
-          </td>
-        </tr>
-        
+        {orders?.map((item) => (
+          <tr className="widgetLgTr" key={item._id}>
+            <td className="widgetLgUser">
+              <span className="widgetLgName">{item?.userId}</span>
+            </td>
+            <td className="widgetLgDate">{format(item?.createdAt)}</td>
+            <td className="widgetLgAmount">{item?.amount}</td>
+            <td className="widgetLgStatus">
+              <Button type={item?.status} />
+            </td>
+          </tr>
         ))}
-       
-       
-        
       </table>
     </div>
   );
