@@ -24,7 +24,7 @@ export default function UserList() {
 
   const confirmDelete = (id,img) =>{
     var r = window.confirm("Are you sure to Delete!");
-    if (r == true) {
+    if (r === true) {
       handleDelete(id)
       deleteImg(img)
     } 

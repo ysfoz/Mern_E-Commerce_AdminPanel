@@ -45,7 +45,7 @@ export default function NewUser() {
       img: Yup.string()
     }),
     onSubmit: (values) => {
-    handleClick(values)
+    imgFile ? handleClick(values) : createUser(dispatch,values)
     history.push('/users')
     
   

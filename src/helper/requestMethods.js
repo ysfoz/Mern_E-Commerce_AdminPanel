@@ -85,13 +85,10 @@ export const createUser = async (dispatch, newuser) => {
 
 //update
 export const updateUser = async (dispatch, id, user) => {
-  console.log(
-    "🚀 ~ file: requestMethods.js ~ line 91 ~ updateUser ~ user",
-    user
-  );
+  
   dispatch(getUserStart());
   try {
-    const res = await userRequest.put(`/users/adminupdate/${id}`, user);
+   await userRequest.put(`/users/adminupdate/${id}`, user);
     
     dispatch(getUserUpdate(id, user));
   } catch (error) {
@@ -104,7 +101,7 @@ export const updateUser = async (dispatch, id, user) => {
 export const deleteUser = async (id, dispatch) => {
   dispatch(getStart());
   try {
-    const res = await userRequest.delete(`/users/${id}`);
+    await userRequest.delete(`/users/${id}`);
 
     dispatch(getUserDeleteSuccess(id));
   } catch (error) {
@@ -129,7 +126,7 @@ export const getProducts = async (dispatch) => {
 export const deleteProduct = async (id, dispatch) => {
   dispatch(getStart());
   try {
-    const res = await userRequest.delete(`/products/${id}`);
+    await userRequest.delete(`/products/${id}`);
     dispatch(deleteProductSuccess(id));
   } catch (error) {
     dispatch(getFailure());
@@ -140,7 +137,7 @@ export const deleteProduct = async (id, dispatch) => {
 export const updateProduct = async (id, product, dispatch, cb) => {
   dispatch(getStart());
   try {
-    const res = await userRequest.put(`/products/${id}`, product);
+    await userRequest.put(`/products/${id}`, product);
     dispatch(updateProductSuccess(id, product));
     cb();
   } catch (error) {

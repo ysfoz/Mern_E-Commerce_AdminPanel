@@ -20,7 +20,7 @@ export default function ProductList() {
  
   const confirmDelete = (item,img) =>{
     var r = window.confirm("Are you sure to Delete!");
-    if (r == true) {
+    if (r === true) {
       handleDelete(item)
       deleteImg(img)
     } 
@@ -56,7 +56,7 @@ export default function ProductList() {
 
 
   const columns = [
-    { field: "id", headerName: "ID", width: 220 },
+    { field: "_id", headerName: "ID", width: 220 },
     {
       field: "product",
       headerName: "Product",
@@ -84,12 +84,12 @@ export default function ProductList() {
       renderCell: (params) => {
         return (
           <>
-            <Link to={"/product/" + params.row?.id}>
+            <Link to={"/product/" + params.row?._id}>
               <button className="productListEdit">Edit</button>
             </Link>
             <DeleteOutline
               className="productListDelete"
-              onClick={() => confirmDelete(params.row?.id,params.row?.img)}
+              onClick={() => confirmDelete(params.row?._id,params.row?.img)}
             />
           </>
         );
@@ -103,7 +103,7 @@ export default function ProductList() {
         rows={products}
         disableSelectionOnClick
         columns={columns}
-        getRowId={(row)=>row.id }
+        getRowId={(row)=>row._id }
         pageSize={8}
         checkboxSelection
       />

@@ -16,7 +16,7 @@ export default function Topbar() {
 
 const confirmExit = () =>{
   var r = window.confirm("Are you sure to exit!");
-  if (r == true) {
+  if (r === true) {
     logout(dispatch)
     history.push('/login')
   } 
