@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import "./product.css";
 import Chart from "../../components/chart/Chart";
-import { Publish } from "@material-ui/icons";
 import { userRequest, updateProduct } from "../../helper/requestMethods";
 import { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -14,6 +13,8 @@ import {
 } from "firebase/storage";
 import app from "../../helper/firebase";
 import { useHistory } from "react-router";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 export default function Product() {
   const location = useLocation().pathname;
@@ -22,7 +23,8 @@ export default function Product() {
     state?.product?.products?.find((product) => product?._id === productId)
   );
   const [pStats, setPStats] = useState([]);
-  const [productItem, setProductItem] = useState({});
+  // const [productItem, setProductItem] = useState({});
+  const [cat, setCat] = useState([]);
   const [imgFile, setImgFile] = useState(null);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -65,11 +67,11 @@ export default function Product() {
     getStats();
   }, [productId, MONTHS]);
 
-  const handleChange = (e) => {
-    setProductItem((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
-  };
+  // const handleChange = (e) => {
+  //   setProductItem((prev) => {
+  //     return { ...prev, [e.target.name]: e.target.value };
+  //   });
+  // };
 
   const deleteImg = () => {
     const storage = getStorage(app);
@@ -87,17 +89,57 @@ export default function Product() {
       });
   };
 
-  const historyPush = ()=>{
-    history.push("/products")
-  }
+  const formik = useFormik({
+    initialValues: {
+      title: product.title,
+      desc: product.desc,
+      img: product.img,
+      categories: product.categories,
+      size: product.size,
+      color: product.color,
+      price: product.price,
+      inStock: product.inStock,
+    },
+    validationSchema: Yup.object({
+      title: Yup.string()
+        .required("Product name is required")
+        .min(3, "Username is too short - should be 3 chars minimum."),
+      desc: Yup.string("").required("Description is required!!"),
+      img: Yup.string(),
+      categories: Yup.array(),
+      size: Yup.array(),
+      color: Yup.array(),
+      price: Yup.number().required("price is required"),
+      inStock: Yup.boolean().default(true),
+    }),
+    onSubmit: (values) => {
+      console.log(
+        "🚀 ~ file: Product.jsx ~ line 118 ~ Product ~ values",
+        values
+      );
 
-  const handleClick = (e) => {
+      handleClick(values);
+    },
+  });
+
+  const historyPush = () => {
+    history.push("/products");
+  };
+
+  const handleCat = (e) => {
+    setCat(e.target.value.split(","));
+  };
+
+  const handleClick = (values) => {
+    console.log(
+      "🚀 ~ file: Product.jsx ~ line 137 ~ handleClick ~ values",
+      values
+    );
     if (imgFile) {
-      deleteImg();
-      e.preventDefault();
+      product?.img && deleteImg();
       const fileName = "products" + new Date().getTime() + imgFile[0]?.name;
       const storage = getStorage(app);
-      const productRef = ref(storage, `products/${productItem?.title}/`);
+      const productRef = ref(storage, `products/${values?.title}/`);
       const storageRef = ref(productRef, fileName);
       const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
 
@@ -139,15 +181,26 @@ export default function Product() {
         () => {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            const product = { ...productItem, img: downloadURL };
-            updateProduct(productId, product, dispatch,historyPush)
+            const product = {
+              ...values,
+              img: downloadURL,
+              categories: cat ? cat : values?.categories,
+            };
+            updateProduct(productId, product, dispatch, historyPush);
+            console.log(
+              "🚀 ~ file: Product.jsx ~ line 182 ~ getDownloadURL ~ product",
+              product
+            );
           });
         }
       );
     } else {
-      updateProduct(productId, productItem, dispatch, historyPush)
-        
-      
+      const product = { ...values, categories: cat ? cat : values?.categories };
+      updateProduct(productId, product, dispatch, historyPush);
+      console.log(
+        "🚀 ~ file: Product.jsx ~ line 188 ~ handleClick ~ product",
+        product
+      );
     }
   };
 
@@ -188,53 +241,119 @@ export default function Product() {
         </div>
       </div>
       <div className="productBottom">
-        <form className="productForm">
+        <form className="productForm" onSubmit={formik.handleSubmit}>
           <div className="productFormLeft">
-            <label>Product Name</label>
+            <label>Title</label>
             <input
+              id="title"
               name="title"
               type="text"
-              placeholder={product?.title}
-              onChange={handleChange}
+              placeholder="Apple Airpods"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.title}
             />
-            <label>Product Description</label>
+            {formik.touched.title && formik.errors.title ? (
+              <div>{formik.errors.title}</div>
+            ) : null}
+            <label>Description</label>
             <input
+              id="desc"
               name="desc"
               type="text"
-              placeholder={product?.desc}
-              onChange={handleChange}
+              placeholder="Apple Airpods"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.desc}
             />
-            <label>Product Price</label>
+            {formik.touched.desc && formik.errors.desc ? (
+              <div>{formik.errors.desc}</div>
+            ) : null}
+            <label>Price</label>
             <input
+              id="price"
               name="price"
-              type="text"
-              placeholder={product?.price}
-              onChange={handleChange}
+              type="number"
+              placeholder="100"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.price}
             />
-            <label>In Stock</label>
-            <select name="inStock" id="idStock" onChange={handleChange}>
+            {formik.touched.price && formik.errors.price ? (
+              <div>{formik.errors.price}</div>
+            ) : null}
+            <label>Stock</label>
+            <select
+              id="inStock"
+              name="inStock"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.inStock}
+            >
               <option value="true">Yes</option>
               <option value="false">No</option>
             </select>
           </div>
           <div className="productFormRight">
-            <div className="productUpload">
-              <img src={product?.img} alt="" className="productUploadImg" />
-              <label htmlFor="file">
-                <Publish />
-              </label>
-              <input
-                type="file"
-                id="file"
-                style={{ display: "none" }}
-                onChange={(e) => setImgFile(e.target.files)}
-              />
-            </div>
+            {/* <div className="productUpload"> */}
+            <label htmlFor="img">Image</label>
+            <input
+              type="file"
+              id="img"
+              name="img"
+              onChange={(e) => setImgFile(e.target.files)}
+            />
+            {formik.touched.img && formik.errors.img ? (
+              <div>{formik.errors.img}</div>
+            ) : null}
+            {/* </div> */}
+
+            <label htmlFor="cat">Categories</label>
+            <input
+              id="cat"
+              name="cat"
+              type="text"
+              placeholder="Jeans, skirts"
+              onChange={handleCat}
+            />
+
+            <label htmlFor="color">Choose colors:</label>
+            <select
+              name="color"
+              id="color"
+              multiple
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.color}
+            >
+              <option value="red">Red</option>
+              <option value="black">Black</option>
+              <option value="blue">Blue</option>
+              <option value="yellow">Yellow</option>
+              <option value="green">Green</option>
+              <option value="white">White</option>
+            </select>
+
+            <label htmlFor="size">Choose sizes:</label>
+            <select
+              name="size"
+              id="size"
+              multiple
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.size}
+            >
+              <option value="xs">XS</option>
+              <option value="s">S</option>
+              <option value="m">M</option>
+              <option value="l">L</option>
+              <option value="xl">XL</option>
+            </select>
           </div>
+          <button type="submit" className="productButton">
+            Update
+          </button>
         </form>
-        <button onClick={handleClick} className="productButton">
-          Update
-        </button>
       </div>
     </div>
   );

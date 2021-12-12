@@ -12,6 +12,8 @@ import {
   deleteObject,
 } from "firebase/storage";
 import app from "../../helper/firebase";
+import noImage from "../../assets/noImage.png"
+
 
 export default function ProductList() {
  
@@ -64,7 +66,7 @@ export default function ProductList() {
       renderCell: (params) => {
         return (
           <div className="productListItem">
-            <img className="productListImg" src={params.row.img} alt="" />
+            <img className="productListImg" src={params?.row?.img || noImage} alt="" />
             {params.row.title}
           </div>
         );

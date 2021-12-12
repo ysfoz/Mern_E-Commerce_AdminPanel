@@ -10,32 +10,58 @@ import {
 import { createProduct } from "../../helper/requestMethods";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 export default function NewProduct() {
-  const [inputs, setInputs] = useState({});
   const [imgFile, setImgFile] = useState(null);
-  const [cat, setCat] = useState([]);
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const handleChange = (e) => {
-    setInputs((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
-  };
-  const handleCat = (e) => {
-    setCat(e.target.value.split(","));
-  };
+  const formik = useFormik({
+    initialValues: {
+      title: "",
+      desc: "",
+      img: "",
+      categories: [],
+      size: [],
+      color: [],
+      price: null,
+      inStock: true,
+    },
+    validationSchema: Yup.object({
+      title: Yup.string()
+        .required("Product name is required")
+        .min(3, "Username is too short - should be 3 chars minimum."),
+      desc: Yup.string("").required("Description is required!!"),
+      img: Yup.string(),
+      categories: Yup.array(),
+      size: Yup.array(),
+      color: Yup.array(),
+      price: Yup.number().required("price is required"),
+      inStock: Yup.boolean().default(true),
+    }),
+    onSubmit: (values) => {
+      if(imgFile !== null){
+        handleClick(values)
+      } else {
+        const product = { ...values};
+        createProduct(product,dispatch,historyPush)
+        
+      }
+    },
+  });
 
-  const historyPush =() => {
+
+  const historyPush = () => {
     history.push("/products");
-  }
+  };
 
-  const handleClick = (e) => {
-    e.preventDefault();
+  const handleClick = (values) => {
+  
     const fileName = "products" + new Date().getTime() + imgFile[0]?.name;
     const storage = getStorage(app);
-    const productRef = ref(storage, `products/${inputs?.title}/`);
+    const productRef = ref(storage, `products/${values?.title}/`);
     const storageRef = ref(productRef, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
 
@@ -77,9 +103,8 @@ export default function NewProduct() {
       () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          const product = { ...inputs, img: downloadURL, categories: cat }
-          createProduct(product, dispatch,historyPush)
-
+          const product = { ...values, img: downloadURL};
+          createProduct(product, dispatch, historyPush);
         });
       }
     );
@@ -88,55 +113,140 @@ export default function NewProduct() {
   return (
     <div className="newProduct">
       <h1 className="addProductTitle">New Product</h1>
-      <form className="addProductForm">
+      <form className="addProductForm" onSubmit={formik.handleSubmit}>
         <div className="addProductItem">
-          <label>Image</label>
+          <label htmlFor="img">Image</label>
           <input
             type="file"
-            id="file"
+            id="img"
+            name="img"
             onChange={(e) => setImgFile(e.target.files)}
           />
+          {formik.touched.img && formik.errors.img ? (
+            <div>{formik.errors.img}</div>
+          ) : null}
         </div>
         <div className="addProductItem">
           <label>Title</label>
           <input
+            id="title"
             name="title"
             type="text"
             placeholder="Apple Airpods"
-            onChange={handleChange}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.title}
           />
+          {formik.touched.title && formik.errors.title ? (
+            <div>{formik.errors.title}</div>
+          ) : null}
         </div>
         <div className="addProductItem">
           <label>Description</label>
           <input
+            id="desc"
             name="desc"
             type="text"
             placeholder="Apple Airpods"
-            onChange={handleChange}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.desc}
           />
+          {formik.touched.desc && formik.errors.desc ? (
+            <div>{formik.errors.desc}</div>
+          ) : null}
         </div>
         <div className="addProductItem">
           <label>Price</label>
           <input
+            id="price"
             name="price"
             type="number"
             placeholder="100"
-            onChange={handleChange}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.price}
           />
+          {formik.touched.price && formik.errors.price ? (
+            <div>{formik.errors.price}</div>
+          ) : null}
         </div>
         <div className="addProductItem">
-          <label>Categories</label>
-          <input type="text" placeholder="Jeans, skirts" onChange={handleCat} />
+          <label htmlFor="categories">Categories</label>
+          <select
+            name="categories"
+            id="categories"
+            multiple
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.categories}
+          >
+            <option value="man">Man</option>
+            <option value="woman">Woman</option>
+            <option value="kind">Kind</option>
+            <option value="winter">Winter</option>
+            <option value="summer">Summer</option>
+            <option value="accesioriens">Accesioriens</option>
+            <option value="bag">Bag</option>
+            <option value="coat">Coat</option>
+            <option value="jeans">Jeans</option>
+          </select>
+          
+          {formik.touched.categories && formik.errors.categories ? (
+            <div>{formik.errors.categories}</div>
+          ) : null}
+        </div>
+
+        <div className="addProductItem">
+          <label htmlFor="color">Choose colors:</label>
+          <select
+            name="color"
+            id="color"
+            multiple
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.color}
+          >
+            <option value="red">Red</option>
+            <option value="black">Black</option>
+            <option value="blue">Blue</option>
+            <option value="yellow">Yellow</option>
+            <option value="green">Green</option>
+            <option value="white">White</option>
+          </select>
+        </div>
+        <div className="addProductItem">
+          <label htmlFor="size">Choose sizes:</label>
+          <select
+            name="size"
+            id="size"
+            multiple
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.size}
+          >
+            <option value="xs">XS</option>
+            <option value="s">S</option>
+            <option value="m">M</option>
+            <option value="l">L</option>
+            <option value="xl">XL</option>
+          </select>
         </div>
         <div className="addProductItem">
           <label>Stock</label>
-          <select name="inStock" onChange={handleChange}>
+          <select
+            id="inStock"
+            name="inStock"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.inStock}
+          >
             <option value="true">Yes</option>
             <option value="false">No</option>
           </select>
         </div>
 
-        <button onClick={handleClick} className="addProductButton">
+        <button type="submit"  className="addProductButton">
           Create
         </button>
       </form>

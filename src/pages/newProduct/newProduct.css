@@ -4,6 +4,7 @@
 
 .addProductForm {
   margin-top: 10px;
+  
 }
 
 .addProductItem {
@@ -36,4 +37,12 @@
   color: white;
   font-weight: 600;
   cursor: pointer;
+}
+.imageButton{
+
+  background-color: teal;
+  text-align: center;
+  padding: 10px;
+  
+  
 }

@@ -57,6 +57,7 @@ export default function User() {
       img: Yup.string(),
     }),
     onSubmit: (values) => {
+     
       handleClick(values);
     },
   });
@@ -79,10 +80,10 @@ export default function User() {
 
   const handleClick = (values) => {
     if (imgFile) {
-      deleteImg();
+      user?.img && deleteImg()
       const fileName = new Date().getTime() + imgFile[0]?.name;
       const storage = getStorage(app);
-      const usersRef = ref(storage,`users/${values.username}/`)
+      const usersRef = ref(storage, `users/${values.username}/`);
       const storageRef = ref(usersRef, fileName);
       const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
 
@@ -125,14 +126,12 @@ export default function User() {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             const newUser = { ...values, img: downloadURL };
-            updateUser(dispatch, userId, newUser)
-            .then(history.push("/users"));
+            updateUser(dispatch, userId, newUser).then(history.push("/users"));
           });
         }
       );
     } else {
-      updateUser(dispatch, userId, values)
-      .then(history.push("/users"))
+      updateUser(dispatch, userId, values).then(history.push("/users"));
     }
   };
 

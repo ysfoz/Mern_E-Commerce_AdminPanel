@@ -12,6 +12,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import app from "../../helper/firebase";
+import avatar from "../../assets/avatar.png"
 
 export default function UserList() {
   const [orders, setOrders] = useState([]);
@@ -82,7 +83,7 @@ export default function UserList() {
               email: users[i]?.email,
               img:
                 users[i]?.img ||
-                "https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
+                avatar,
               status: "Passive",
               transaction: 0,
             },
@@ -97,7 +98,7 @@ export default function UserList() {
               email: users[i]?.email,
               img:
                 users[i]?.img ||
-                "https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
+                avatar,
               status: "Active",
               transaction: amount,
             }
