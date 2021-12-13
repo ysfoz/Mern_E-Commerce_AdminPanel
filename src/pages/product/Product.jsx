@@ -112,10 +112,7 @@ export default function Product() {
       inStock: Yup.boolean().default(true),
     }),
     onSubmit: (values) => {
-      console.log(
-        "🚀 ~ file: Product.jsx ~ line 118 ~ Product ~ values",
-        values
-      );
+     
 
       handleClick(values);
     },

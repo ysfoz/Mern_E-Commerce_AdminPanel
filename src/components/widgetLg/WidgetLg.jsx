@@ -27,6 +27,7 @@ export default function WidgetLg() {
     <div className="widgetLg">
       <h3 className="widgetLgTitle">Latest transactions</h3>
       <table className="widgetLgTable">
+      <tbody>
         <tr className="widgetLgTr">
           <th className="widgetLgTh">Customer</th>
           <th className="widgetLgTh">Date</th>
@@ -45,6 +46,7 @@ export default function WidgetLg() {
             </td>
           </tr>
         ))}
+        </tbody>
       </table>
     </div>
   );
