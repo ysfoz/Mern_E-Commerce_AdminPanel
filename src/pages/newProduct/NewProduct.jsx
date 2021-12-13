@@ -26,7 +26,7 @@ export default function NewProduct() {
       categories: [],
       size: [],
       color: [],
-      price: null,
+      price: "",
       inStock: true,
     },
     validationSchema: Yup.object({
@@ -186,7 +186,7 @@ export default function NewProduct() {
             <option value="kind">Kind</option>
             <option value="winter">Winter</option>
             <option value="summer">Summer</option>
-            <option value="accesioriens">Accesioriens</option>
+            <option value="accessories">Accessories</option>
             <option value="bag">Bag</option>
             <option value="coat">Coat</option>
             <option value="jeans">Jeans</option>
