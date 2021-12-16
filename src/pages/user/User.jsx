@@ -83,7 +83,7 @@ export default function User() {
       user?.img && deleteImg()
       const fileName = new Date().getTime() + imgFile[0]?.name;
       const storage = getStorage(app);
-      const usersRef = ref(storage, `users/${values.username}/`);
+      const usersRef = ref(storage, 'users/');
       const storageRef = ref(usersRef, fileName);
       const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
 

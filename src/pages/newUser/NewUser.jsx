@@ -56,7 +56,7 @@ export default function NewUser() {
   const handleClick = (values)=> {
     const fileName= "AdminprofilePhoto" + new Date().getTime() + imgFile[0]?.name
     const storage = getStorage(app)
-    const usersRef = ref(storage,`users/${values.username}/`)
+    const usersRef = ref(storage,'users/')
     const storageRef = ref(usersRef,fileName)
     const uploadTask = uploadBytesResumable(storageRef, imgFile[0]);
 
