@@ -291,7 +291,7 @@ export default function Product() {
             >
               <option value="man">Man</option>
               <option value="woman">Woman</option>
-              <option value="child">Kind</option>
+              <option value="child">Child</option>
               <option value="winter">Winter</option>
               <option value="summer">Summer</option>
               <option value="accessories">Accessories</option>
