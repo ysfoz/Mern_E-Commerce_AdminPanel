@@ -132,7 +132,7 @@ export default function NewProduct() {
             id="title"
             name="title"
             type="text"
-            placeholder="Apple Airpods"
+            placeholder="T-shirt model:tsm01"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.title}
@@ -147,7 +147,7 @@ export default function NewProduct() {
             id="desc"
             name="desc"
             type="text"
-            placeholder="Apple Airpods"
+            placeholder="100% cotton"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.desc}
@@ -183,13 +183,11 @@ export default function NewProduct() {
           >
             <option value="man">Man</option>
             <option value="woman">Woman</option>
-            <option value="kind">Kind</option>
+            <option value="child">Kind</option>
             <option value="winter">Winter</option>
             <option value="summer">Summer</option>
             <option value="accessories">Accessories</option>
-            <option value="bag">Bag</option>
-            <option value="coat">Coat</option>
-            <option value="jeans">Jeans</option>
+        
           </select>
           
           {formik.touched.categories && formik.errors.categories ? (
