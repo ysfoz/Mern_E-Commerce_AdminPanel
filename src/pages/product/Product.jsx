@@ -66,12 +66,6 @@ export default function Product() {
     getStats();
   }, [productId, MONTHS]);
 
-  // const handleChange = (e) => {
-  //   setProductItem((prev) => {
-  //     return { ...prev, [e.target.name]: e.target.value };
-  //   });
-  // };
-
   const deleteImg = () => {
     const storage = getStorage(app);
 
@@ -112,8 +106,6 @@ export default function Product() {
       inStock: Yup.boolean().default(true),
     }),
     onSubmit: (values) => {
-     
-
       handleClick(values);
     },
   });
@@ -122,10 +114,7 @@ export default function Product() {
     history.push("/products");
   };
 
-
-
   const handleClick = (values) => {
-  
     if (imgFile) {
       product?.img && deleteImg();
       const fileName = "products" + new Date().getTime() + imgFile[0]?.name;
@@ -174,14 +163,14 @@ export default function Product() {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             const product = {
               ...values,
-              img: downloadURL
+              img: downloadURL,
             };
             updateProduct(productId, product, dispatch, historyPush);
           });
         }
       );
     } else {
-      const product = { ...values};
+      const product = { ...values };
       updateProduct(productId, product, dispatch, historyPush);
     }
   };
@@ -223,13 +212,10 @@ export default function Product() {
         </div>
       </div>
 
-
-
-
       <div className="productBottom">
         <form className="productForm" onSubmit={formik.handleSubmit}>
           <div className="productFormLeft">
-          <label htmlFor="img">Image</label>
+            <label htmlFor="img">Image</label>
             <input
               type="file"
               id="img"
@@ -290,33 +276,30 @@ export default function Product() {
               <option value="false">No</option>
             </select>
             <button type="submit" className="productButton">
-            Update
-          </button>
+              Update
+            </button>
           </div>
           <div className="productFormRight">
-         
-
             <label htmlFor="categories">Categories</label>
-          <select
-            name="categories"
-            id="categories"
-            multiple
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.categories}
-          >
-            <option value="man">Man</option>
-            <option value="woman">Woman</option>
-            <option value="child">Kind</option>
-            <option value="winter">Winter</option>
-            <option value="summer">Summer</option>
-            <option value="accessories">Accessories</option>
-            
-          </select>
-          
-          {formik.touched.categories && formik.errors.categories ? (
-            <div>{formik.errors.categories}</div>
-          ) : null}
+            <select
+              name="categories"
+              id="categories"
+              multiple
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.categories}
+            >
+              <option value="man">Man</option>
+              <option value="woman">Woman</option>
+              <option value="child">Kind</option>
+              <option value="winter">Winter</option>
+              <option value="summer">Summer</option>
+              <option value="accessories">Accessories</option>
+            </select>
+
+            {formik.touched.categories && formik.errors.categories ? (
+              <div>{formik.errors.categories}</div>
+            ) : null}
 
             <label htmlFor="color">Choose colors:</label>
             <select
@@ -351,7 +334,6 @@ export default function Product() {
               <option value="xl">XL</option>
             </select>
           </div>
-          
         </form>
       </div>
     </div>
