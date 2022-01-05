@@ -8,12 +8,12 @@ const ProductSlice = createSlice({
     error: false,
   },
   reducers: {
-   //START
+    //START
     getStart: (state) => {
       state.isFetching = true;
       state.error = false;
     },
-     // GET ALL
+    // GET ALL
     getProductSuccess: (state, action) => {
       state.isFetching = false;
       state.products = action.payload;
@@ -24,29 +24,26 @@ const ProductSlice = createSlice({
       state.isFetching = false;
     },
 
-  //DELETE
+    //DELETE
     deleteProductSuccess: (state, action) => {
       state.isFetching = false;
       state.products.splice(
         state.products.findIndex((item) => item._id === action.payload),
-        1, 
-        );
-     
-        
+        1
+      );
     },
     // UPDATE
     // this is not working ????
     updateProductSuccess: (state, action) => {
       state.isFetching = false;
       state.products[
-          state.products.findIndex((item) => item._id === action.payload.id)
-      ] = action.payload.product
-    
+        state.products.findIndex((item) => item._id === action.payload.id)
+      ] = action.payload.product;
     },
     // CREATE
     createProductSuccess: (state, action) => {
       state.isFetching = false;
-      state.products.push(action.payload)
+      state.products.push(action.payload);
     },
   },
 });

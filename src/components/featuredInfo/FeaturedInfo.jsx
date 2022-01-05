@@ -13,7 +13,7 @@ export default function FeaturedInfo() {
     try {
       const res = await userRequest.get("/orders/income");
       setIncome(res?.data);
-      setPercentage((res?.data[1]?.total * 100) / res?.data[0].total - 100);
+      setPercentage((res?.data[1]?.total * 100) / res?.data[0]?.total - 100);
     } catch (error) {
       console.log(error);
     }
