@@ -18,7 +18,7 @@ import {
   getUserUpdate,
 } from "../redux/userRedux";
 
-const BASE_URL = "https://mern-e-commerce-api.herokuapp.com/api/";
+const BASE_URL = "https://shoppingoo-api.onrender.com/api/";
 
 let TOKEN = {};
 

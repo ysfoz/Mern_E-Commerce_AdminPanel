@@ -59,7 +59,7 @@ export default function UserList() {
   const getOrders = async () => {
     try {
       const res = await axios.get(
-        "https://mern-e-commerce-api.herokuapp.com/api/orders",
+        "https://shoppingoo-api.onrender.com/api/orders",
         { headers: { token: `Bearer ${TOKEN}` || "Bearer 123" } }
       );
       setOrders(res?.data);
