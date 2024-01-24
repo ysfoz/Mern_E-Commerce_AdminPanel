@@ -1,23 +1,7 @@
 
-
-# Links
-
-[HEROKU](https://react-shop-admin.herokuapp.com/login)
-<br>
-username = admin
-<br>
-pass = 123456 
-<br>
-[Api Heroku Link](https://mern-e-commerce-api.herokuapp.com/)
-<br>
-[Api Github Link](https://github.com/ysfoz/Mern_E-Commerce_API)
-
-
 # VIDEO
 <img src = "video-gif.gif" width =1000/>
 # Getting Started with Create React App
-
-Thanks a lot [Safak Kocaoglu](https://www.youtube.com/c/LamaDev/featured)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
